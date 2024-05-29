@@ -1,13 +1,28 @@
-from math import pi
+import math
 
 stroke = '#'
+stroke_ratio = 0.275
+inv_stroke_ratio = 1 / stroke_ratio
+
+""" FUNCTIONS:
+pyramid(int): triangular pyramid
+grid(int, int): open grid
+grid_border(int, int): closed grid
+window(int): window
+hashtag(int): hashtag
+diagonals(int, int): diagonals with spacing
+squole(int): square hole fractal
+square(int): square
+coicle(int): circle
+doisk(int): filled coicle
+realistic_doisk(int): doisk that considers font aspect ratio
+checkerboard(int): checkerboard
+smog(*args): aversion tactic
+"""
 
 ## USEFUL FUNCTIONS ##
 def line(n):
-    line = ""
-    for _ in range(n):
-        line += stroke
-    return line
+    return n * stroke
 
 def staggered(distance, length):
     """Outputs * staggered every n units for a string of length k"""
@@ -20,10 +35,7 @@ def staggered(distance, length):
     return line
 
 def silence(length):
-    line = ""
-    for _ in range(length):
-        line += " "
-    return line
+    return length * " "
 
 
 ## SIMPLE STUFF ##
@@ -49,7 +61,7 @@ def grid_border(spacing, number):
         else:
             print(staggered(spacing, total))
 
-## WHY NOTS
+## WHY NOTS ##
 
 def window(length):
     """Makes a window with panel side length"""
@@ -106,3 +118,90 @@ class Squole:
 def squole(size):
     print(Squole(size))
 
+## SHAPES ##
+def round_to_even(num):
+    return round(num / 2) * 2
+
+def square(size):
+    for _ in range(size):
+        print(line(size))
+
+def coicle(diameter):
+    def inner_coicle(diameter):
+        radius = diameter / 2
+        lines, ks = [], []
+
+        for i in range(diameter):
+            if i < radius:
+                ks.append(round_to_even(inv_stroke_ratio * math.sqrt(radius ** 2 - (radius - i) ** 2)))
+            else:
+                ks.append(round_to_even(inv_stroke_ratio * math.sqrt(radius ** 2 - ((i - radius) ** 2))))
+
+        # make a centered line of k stars over diameter spaces
+        horiz_diameter = round(inv_stroke_ratio * diameter)
+        for i in range(diameter):
+            number = ks[i]
+            side = (horiz_diameter - number) // 2
+            side_space = silence(side)
+            lines.append(side_space + stroke + silence(number - 2) + stroke)
+        
+        return '\n'.join(lines) # trust
+    print(inner_coicle(diameter))
+
+def doisk(diameter):
+    def inner_doisk(diameter):
+        radius = diameter / 2
+        lines, ks = [], []
+
+        for i in range(diameter):
+            if i < radius:
+                ks.append(round_to_even(math.sqrt(radius ** 2 - (radius - i) ** 2)))
+            else:
+                ks.append(round_to_even(math.sqrt(radius ** 2 - ((i - radius) ** 2))))
+
+        # make a centered line of k stars over diameter spaces
+        for i in range(diameter):
+            number = ks[i]
+            side = (diameter - number) // 2
+            side_space = silence(side)
+            lines.append(side_space + line(number) + side_space)
+        
+        return '\n'.join(lines) # trust
+    print(inner_doisk(diameter))
+
+def realistic_doisk(diameter):
+    def inner_doisk(diameter):
+        radius = diameter / 2
+        lines, ks = [], []
+
+        for i in range(diameter):
+            if i < radius:
+                ks.append(round_to_even(inv_stroke_ratio * math.sqrt(radius ** 2 - (radius - i) ** 2)))
+            else:
+                ks.append(round_to_even(inv_stroke_ratio * math.sqrt(radius ** 2 - ((i - radius) ** 2))))
+
+        # make a centered line of k stars over diameter spaces
+        horiz_diameter = round(inv_stroke_ratio * diameter)
+        for i in range(diameter):
+            number = ks[i]
+            side = (horiz_diameter - number) // 2
+            side_space = silence(side)
+            lines.append(side_space + line(number) + side_space)
+        
+        return '\n'.join(lines) # trust
+    print(inner_doisk(diameter))
+
+def checkerboard(size):
+    lines = []
+    for i in range(size):
+        line = ""
+        for j in range(size):
+            if (i + j) % 2 == 0:
+                line += stroke
+            else:
+                line += ' '
+        lines.append(line)
+    print('\n'.join(lines))
+
+def smog(*args):
+    checkerboard(99)
